@@ -98,11 +98,11 @@ public class PlayerController : MonoBehaviour {
 		}
 
 		//Ha így mozgatom akkor nem hat rá a physics material
-		//rb.velocity = new Vector2 (moveX * MaxSpeed, rb.velocity.y);
-		//Így hat a mozgására a phy mat (tehát tud csúszni)
+		rb.velocity = new Vector2 (moveX * MaxSpeed, rb.velocity.y);
+		/*//Így hat a mozgására a phy mat (tehát tud csúszni)
 		if (rb.velocity.x <= 5 && rb.velocity.x >= -5) {
 			rb.AddForce (new Vector2 (moveX * MaxSpeed * 5, 0));
-		}
+		}*/
 
 
 	}

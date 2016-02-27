@@ -5,6 +5,7 @@ public class Player_R_Controller : PlayerController {
 
 	public override float MovementX(){
 		float move = Input.GetAxis ("Horizontal_r");
+
 		return move;
 	}
 
