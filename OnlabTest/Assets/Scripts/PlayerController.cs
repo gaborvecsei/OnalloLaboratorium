@@ -103,8 +103,6 @@ public class PlayerController : MonoBehaviour {
 		if (rb.velocity.x <= 5 && rb.velocity.x >= -5) {
 			rb.AddForce (new Vector2 (moveX * MaxSpeed * 5, 0));
 		}*/
-
-
 	}
 
     
