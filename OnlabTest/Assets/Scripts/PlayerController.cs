@@ -34,10 +34,15 @@ public class PlayerController : MonoBehaviour {
 	public Rigidbody2D rb;
 	//X irányú elmozdulása a játékosnak
 	private float moveX = 0f;
-	//Y irányú elmozdulásért felelős
-	private float moveY = 0f;
 	//Ha true akkor ugrás van
 	private bool jumping = false;
+
+	//Megnézi, hogy milyen fajta platformon vagyunk: (normális, csúszós, ragadós stb)
+	private RaycastHit2D materialCheck;
+	public LayerMask materialCheckMask;
+
+	public bool iHaveTheBall = false;
+	public int ballHoldTime = 100;
 
 	void Start()
 	{
@@ -97,18 +102,41 @@ public class PlayerController : MonoBehaviour {
 			jumping = false;
 		}
 
-		//Ha így mozgatom akkor nem hat rá a physics material
-		rb.velocity = new Vector2 (moveX * MaxSpeed, rb.velocity.y);
-		/*//Így hat a mozgására a phy mat (tehát tud csúszni)
-		if (rb.velocity.x <= 5 && rb.velocity.x >= -5) {
-			rb.AddForce (new Vector2 (moveX * MaxSpeed * 5, 0));
-		}*/
+		//Játékos mozgása
+		Mooving ();
+
 	}
 
-    
+	//A játékos mozgatása, úgy hogy figyelembe veszi a platformok anyagát
+	private void Mooving(){
+		//Megnézi, hogy milyen fajta talaj van alatta RayCasttal
+		float raycastDistance = 0.8f;
+		materialCheck = Physics2D.Raycast (transform.position, -Vector2.up, raycastDistance, materialCheckMask);
+		//Kirajzoljuk a képernyőre
+		Debug.DrawRay (transform.position, -Vector2.up * raycastDistance, Color.green);
 
-	
+		if(materialCheck.collider == null) {
+			//rb.velocity = new Vector2 (moveX * MaxSpeed, rb.velocity.y);
+			rb.AddForce (new Vector2 (moveX * MaxSpeed, 0));
+		} else if ((materialCheck.collider != null) && (materialCheck.collider.tag == "NormalGround")) {
+			rb.velocity = new Vector2 (moveX * MaxSpeed, rb.velocity.y);
+		} else if ((materialCheck.collider != null) && (materialCheck.collider.tag == "SlipperyGround")) {
+			rb.AddForce (new Vector2 (moveX * MaxSpeed, 0));
+		}
+	}
 
+	void OnCollisionEnter2D(Collision2D coll){
+		if (coll.gameObject.tag == "Ball") {
+			Destroy (coll.gameObject);
+			iHaveTheBall = true;
+		}
+	}
 
+	IEnumerator CountDown(){
+		if (ballHoldTime >= 0) {
+			ballHoldTime--;
+		}
+		yield return new WaitForSeconds (1);
+	}
 
 }
