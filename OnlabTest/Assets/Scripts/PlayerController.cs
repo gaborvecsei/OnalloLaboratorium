@@ -41,8 +41,11 @@ public class PlayerController : MonoBehaviour {
 	private RaycastHit2D materialCheck;
 	public LayerMask materialCheckMask;
 
-	public bool iHaveTheBall = false;
-	public int ballHoldTime = 100;
+	private bool iHaveTheBall = false;
+	private int ballHoldTime = 100;
+
+	//Ez jelzi hogy kinél van a labda
+	public GameObject ballParticle;
 
 	void Start()
 	{
@@ -129,6 +132,9 @@ public class PlayerController : MonoBehaviour {
 		if (coll.gameObject.tag == "Ball") {
 			Destroy (coll.gameObject);
 			iHaveTheBall = true;
+			GameObject go;
+			go = Instantiate (ballParticle, transform.position, Quaternion.identity) as GameObject;
+			go.transform.parent = this.transform;
 		}
 	}
 
