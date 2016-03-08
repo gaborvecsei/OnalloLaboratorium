@@ -38,7 +38,7 @@ public class PlayerController : MonoBehaviour {
 	private bool jumping = false;
 
 	//Megnézi, hogy milyen fajta platformon vagyunk: (normális, csúszós, ragadós stb)
-	private RaycastHit2D materialCheck;
+	private RaycastHit2D materialCheckBase;
 	public LayerMask materialCheckMask;
 
 	private bool iHaveTheBall = false;
@@ -114,17 +114,26 @@ public class PlayerController : MonoBehaviour {
 	private void Mooving(){
 		//Megnézi, hogy milyen fajta talaj van alatta RayCasttal
 		float raycastDistance = 0.8f;
-		materialCheck = Physics2D.Raycast (transform.position, -Vector2.up, raycastDistance, materialCheckMask);
-		//Kirajzoljuk a képernyőre
-		Debug.DrawRay (transform.position, -Vector2.up * raycastDistance, Color.green);
+		materialCheckBase = Physics2D.Raycast (transform.position, -Vector2.up, raycastDistance, materialCheckMask);
+		RaycastHit2D materialCheckRight = Physics2D.Raycast (transform.position + new Vector3(0.3f,0,0), -Vector2.up, raycastDistance, materialCheckMask);
+		RaycastHit2D materialCheckLeft = Physics2D.Raycast (transform.position + new Vector3(-0.3f,0,0), -Vector2.up, raycastDistance, materialCheckMask);
 
-		if(materialCheck.collider == null) {
+		//Kirajzoljuk a képernyőre a materialCheckBase-t, materialCheckRight-et, materialCheckLeft-et
+		Debug.DrawRay (transform.position, -Vector2.up * raycastDistance, Color.green);
+		Debug.DrawRay (transform.position + new Vector3(0.3f,0,0), -Vector2.up * raycastDistance, Color.green);
+		Debug.DrawRay (transform.position + new Vector3(-0.3f,0,0), -Vector2.up * raycastDistance, Color.green);
+
+		if ((materialCheckBase.collider == null && materialCheckRight.collider != null) || (materialCheckBase.collider == null && materialCheckLeft.collider != null)) {
 			//rb.velocity = new Vector2 (moveX * MaxSpeed, rb.velocity.y);
+			//rb.AddForce (new Vector2 (moveX * MaxSpeed, 0));
 			rb.AddForce (new Vector2 (moveX * MaxSpeed, 0));
-		} else if ((materialCheck.collider != null) && (materialCheck.collider.tag == "NormalGround")) {
+			Debug.Log ("valami");
+		} else if ((materialCheckBase.collider != null) && (materialCheckBase.collider.tag == "NormalGround")) {
 			rb.velocity = new Vector2 (moveX * MaxSpeed, rb.velocity.y);
-		} else if ((materialCheck.collider != null) && (materialCheck.collider.tag == "SlipperyGround")) {
+		} else if ((materialCheckBase.collider != null) && (materialCheckBase.collider.tag == "SlipperyGround")) {
 			rb.AddForce (new Vector2 (moveX * MaxSpeed, 0));
+		} else {
+			rb.velocity = new Vector2 (moveX * MaxSpeed, rb.velocity.y);
 		}
 	}
 
