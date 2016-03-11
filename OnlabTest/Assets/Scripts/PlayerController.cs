@@ -14,7 +14,7 @@ public class PlayerController : MonoBehaviour {
 	}
 
     //Merre néz a játékos
-    private bool faceingLeft = true;
+    protected bool faceingLeft = true;
     //A talajjal érintkezik e
     private bool isGrounded = false;
     //Ez a segéd Gameobject ami megnézi, hogy a talajon van e
@@ -41,11 +41,13 @@ public class PlayerController : MonoBehaviour {
 	private RaycastHit2D materialCheckBase;
 	public LayerMask materialCheckMask;
 
-	private bool iHaveTheBall = false;
+	protected bool iHaveTheBall = false;
 	private int ballHoldTime = 100;
+	float timeCount;
 
 	//Ez jelzi hogy kinél van a labda
 	public GameObject ballParticle;
+	public GameObject ballGo;
 
 	void Start()
 	{
@@ -69,9 +71,34 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	//Az ugrás detektálásáért (Inputjáért) felelős
-	public virtual bool Jump(){
+	public virtual bool Jumping(){
 		bool jump = Input.GetButtonDown ("Jump_b");
 		return jump;
+	}
+
+	//A megszerzett labdát el lehet vele hajítani
+	public virtual void BallThrowing(){
+		if (Input.GetButtonDown ("Kiutes_b")) {
+			//Csak akkor dobhatjuk el ha nálunk is van
+			if (iHaveTheBall) {
+				//Referencia a labda GameObject-re
+				GameObject go;
+				//Attól függően, hogy jobbra vagy balra nézünk, olyan irányba dobjuk a labdát
+				if (faceingLeft) {
+					//Kicsit távolabb létrehozzuk a GameObject-et, hogy ne ütközzön megint a Collider-ünkkel
+					go = Instantiate (ballGo, transform.position + new Vector3 (-1, 0, 0), Quaternion.identity) as GameObject;
+					//Erő ráhatás a hajítás érdekében
+					go.GetComponent<Rigidbody2D> ().AddForce (new Vector2 (-500, 500));
+				} else {
+					go = Instantiate (ballGo, transform.position + new Vector3 (1, 0, 0), Quaternion.identity) as GameObject;
+					go.GetComponent<Rigidbody2D> ().AddForce (new Vector2 (500, 500));
+				}
+				//Ha már nincs nálunk, mivel eldobtuk, akkor az azt jelző particle-t ki kell törülnünk
+				Destroy(transform.Find("BallParticle(Clone)").gameObject);
+				//És most már nincs is nálunk a labda
+				iHaveTheBall = false;
+			}
+		}
 	}
 
 		
@@ -92,7 +119,16 @@ public class PlayerController : MonoBehaviour {
 		}
 
 		//Ha megnyomtuk az ugrás gombot akkor ugorhatun
-		jumping = Jump ();
+		jumping = Jumping ();
+		BallThrowing();
+
+		//Visszaszámol másodpercenként amíg nálunk van a labda
+		if(iHaveTheBall && Time.time >= (timeCount+1f)){
+			timeCount = Time.time;
+			ballHoldTime--;
+			Debug.Log (gameObject.name + ": " + ballHoldTime);
+
+		}
 	}
 
 	//Fizikai része van ebben benne
@@ -123,26 +159,31 @@ public class PlayerController : MonoBehaviour {
 		Debug.DrawRay (transform.position + new Vector3(0.3f,0,0), -Vector2.up * raycastDistance, Color.green);
 		Debug.DrawRay (transform.position + new Vector3(-0.3f,0,0), -Vector2.up * raycastDistance, Color.green);
 
-		if ((materialCheckBase.collider == null && materialCheckRight.collider != null) || (materialCheckBase.collider == null && materialCheckLeft.collider != null)) {
-			//rb.velocity = new Vector2 (moveX * MaxSpeed, rb.velocity.y);
-			//rb.AddForce (new Vector2 (moveX * MaxSpeed, 0));
+		//Hogyha nincs alattunk semmi, de jobbról vagy balról igen, akkor biztosra vehetjük, hogy egy platform szélén állunk
+		if ((materialCheckBase.collider == null && materialCheckRight.collider != null)
+			|| (materialCheckBase.collider == null && materialCheckLeft.collider != null)) {
 			rb.AddForce (new Vector2 (moveX * MaxSpeed, 0));
-			Debug.Log ("valami");
-		} else if ((materialCheckBase.collider != null) && (materialCheckBase.collider.tag == "NormalGround")) {
+		}else if ((materialCheckBase.collider != null) && (materialCheckBase.collider.tag == "NormalGround")) {
+			//Ha sima platformon állunk akkor nem kell erőbehatás
 			rb.velocity = new Vector2 (moveX * MaxSpeed, rb.velocity.y);
 		} else if ((materialCheckBase.collider != null) && (materialCheckBase.collider.tag == "SlipperyGround")) {
+			//Viszont ha csúszós platformon állunk akkor kell erő hatás, mivel így érvényesül a Physics material
 			rb.AddForce (new Vector2 (moveX * MaxSpeed, 0));
 		} else {
 			rb.velocity = new Vector2 (moveX * MaxSpeed, rb.velocity.y);
 		}
 	}
 
+	//Ütközés detektálása
 	void OnCollisionEnter2D(Collision2D coll){
+		//Ha a labdával ütközünk
 		if (coll.gameObject.tag == "Ball") {
 			Destroy (coll.gameObject);
 			iHaveTheBall = true;
 			GameObject go;
+			//Létrehozunk egy particle-t ami azt jelzi, hogy kinél vana  labda
 			go = Instantiate (ballParticle, transform.position, Quaternion.identity) as GameObject;
+			//Beállítjuk, hogy a gyereke legyen a játékosnak így a pozíciójuk meg fog egyezni, és együtt mozognak majd
 			go.transform.parent = this.transform;
 		}
 	}
