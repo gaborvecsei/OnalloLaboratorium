@@ -197,7 +197,7 @@ public class PlayerController : MonoBehaviour {
 				kickTime = 0;
 				canKick = false;
 				//Ha kiütöttük akkor már nincs a másiknál a labda
-				Player_r.GetComponent<Player_R_Controller> ().iHaveTheBall = false;
+				otherPlayer.GetComponent<PlayerController> ().iHaveTheBall = false;
 				//Random erő az ütéshez
 				Vector2 randomForce = new Vector2 (Random.Range (-250, 250), Random.Range (400, 1000));
 				Vector3 otherPlayerPos = otherPlayer.transform.position;
