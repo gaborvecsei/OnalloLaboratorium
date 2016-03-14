@@ -13,20 +13,21 @@ public class Player_B_Controller : PlayerController {
 		return jump;
 	}
 		
-	public override void BallThrowing(){
-		if (Input.GetButtonDown ("Kiutes_b")) {
-			if (iHaveTheBall) {
-				GameObject go;
-				if (faceingLeft) {
-					go = Instantiate (ballGo, transform.position + new Vector3 (-1, 0, 0), Quaternion.identity) as GameObject;
-					go.GetComponent<Rigidbody2D> ().AddForce (new Vector2 (-500, 500));
-				} else {
-					go = Instantiate (ballGo, transform.position + new Vector3 (1, 0, 0), Quaternion.identity) as GameObject;
-					go.GetComponent<Rigidbody2D> ().AddForce (new Vector2 (500, 500));
-				}
-				Destroy(transform.Find("BallParticle(Clone)").gameObject);
-				iHaveTheBall = false;
-			}
+	void Update(){
+		//Mindenképp meg kell hívni az alap Update-et hogy mozoghassunk, ugorhassunk stb...
+		base.Update ();
+		//Ezután meghívjuk azt a metódust amivel el lehet dobni a labdát, ill. kiütni a másiktól
+		KickAndThrow("Kiutes_b",Player_r);
+	}
+
+	//Mind a két játékosnál van egy trigger collider
+	//Ha azzal ütközünk és teljesülnek a feltételek, akkor kiüthetjük a labdát tőlük
+	void OnTriggerStay2D(Collider2D coll){
+		if (!iHaveTheBall && kickTime == 10 && coll.gameObject.tag == "Player_r"
+		    && Player_r.GetComponent<Player_R_Controller> ().iHaveTheBall == true) {
+			canKick = true;
+		} else {
+			canKick = false;
 		}
 	}
 

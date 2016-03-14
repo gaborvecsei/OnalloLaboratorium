@@ -41,17 +41,24 @@ public class PlayerController : MonoBehaviour {
 	private RaycastHit2D materialCheckBase;
 	public LayerMask materialCheckMask;
 
-	protected bool iHaveTheBall = false;
+	public bool iHaveTheBall = false;
 	private int ballHoldTime = 100;
 	float timeCount;
+	public int kickTime = 5;
+	public bool canKick = false;
 
 	//Ez jelzi hogy kinél van a labda
 	public GameObject ballParticle;
 	public GameObject ballGo;
 
+	protected GameObject Player_r;
+	protected GameObject Player_b;
+
 	void Start()
 	{
 		rb = GetComponent<Rigidbody2D> ();
+		Player_b = GameObject.Find ("Player_b");
+		Player_r = GameObject.Find ("Player_r");
 	}
 
     //A sprite a másik irányba nézését oldja meg
@@ -75,35 +82,10 @@ public class PlayerController : MonoBehaviour {
 		bool jump = Input.GetButtonDown ("Jump_b");
 		return jump;
 	}
-
-	//A megszerzett labdát el lehet vele hajítani
-	public virtual void BallThrowing(){
-		if (Input.GetButtonDown ("Kiutes_b")) {
-			//Csak akkor dobhatjuk el ha nálunk is van
-			if (iHaveTheBall) {
-				//Referencia a labda GameObject-re
-				GameObject go;
-				//Attól függően, hogy jobbra vagy balra nézünk, olyan irányba dobjuk a labdát
-				if (faceingLeft) {
-					//Kicsit távolabb létrehozzuk a GameObject-et, hogy ne ütközzön megint a Collider-ünkkel
-					go = Instantiate (ballGo, transform.position + new Vector3 (-1, 0, 0), Quaternion.identity) as GameObject;
-					//Erő ráhatás a hajítás érdekében
-					go.GetComponent<Rigidbody2D> ().AddForce (new Vector2 (-500, 500));
-				} else {
-					go = Instantiate (ballGo, transform.position + new Vector3 (1, 0, 0), Quaternion.identity) as GameObject;
-					go.GetComponent<Rigidbody2D> ().AddForce (new Vector2 (500, 500));
-				}
-				//Ha már nincs nálunk, mivel eldobtuk, akkor az azt jelző particle-t ki kell törülnünk
-				Destroy(transform.Find("BallParticle(Clone)").gameObject);
-				//És most már nincs is nálunk a labda
-				iHaveTheBall = false;
-			}
-		}
-	}
-
 		
 	//Inputot kezeli és ami nem a fizikával kapcsolatos
-	void Update()
+	//publikussá tettem, hogy a leszármazottak is lássák, és meg tudják hívni
+	public void Update()
 	{
 		isGrounded = Physics2D.OverlapCircle (groundcheck.transform.position, 0.3f, whatIsGround);
 		//Beolvassuk az X irányú elmozdulásokat
@@ -120,14 +102,19 @@ public class PlayerController : MonoBehaviour {
 
 		//Ha megnyomtuk az ugrás gombot akkor ugorhatun
 		jumping = Jumping ();
-		BallThrowing();
 
 		//Visszaszámol másodpercenként amíg nálunk van a labda
 		if(iHaveTheBall && Time.time >= (timeCount+1f)){
 			timeCount = Time.time;
 			ballHoldTime--;
-			Debug.Log (gameObject.name + ": " + ballHoldTime);
+			//Debug.Log (gameObject.name + ": " + ballHoldTime);
 
+		}
+
+		if (!iHaveTheBall && Time.time >= (timeCount+1f) && kickTime < 10) {
+			timeCount = Time.time;
+			kickTime++;
+			//Debug.Log (gameObject.name + ": " + kickTime);
 		}
 	}
 
@@ -146,7 +133,7 @@ public class PlayerController : MonoBehaviour {
 
 	}
 
-	//A játékos mozgatása, úgy hogy figyelembe veszi a platformok anyagát
+	//A játékos mozgatása, úgy hogy figyelembe veszi a platformok anyagát (kell hozzá a MovementX())
 	private void Mooving(){
 		//Megnézi, hogy milyen fajta talaj van alatta RayCasttal
 		float raycastDistance = 0.8f;
@@ -188,11 +175,40 @@ public class PlayerController : MonoBehaviour {
 		}
 	}
 
-	IEnumerator CountDown(){
-		if (ballHoldTime >= 0) {
-			ballHoldTime--;
+
+	//A labda eldobásáért és a kiütéséért felelős metódus
+	public void KickAndThrow(string inputStr, GameObject otherPlayer){
+		if (Input.GetButtonDown (inputStr)) {
+			if (iHaveTheBall) {
+				GameObject go;
+				if (faceingLeft) {
+					go = Instantiate (ballGo, transform.position + new Vector3 (-1, 0, 0), Quaternion.identity) as GameObject;
+					go.GetComponent<Rigidbody2D> ().AddForce (new Vector2 (-500, 500));
+				} else {
+					go = Instantiate (ballGo, transform.position + new Vector3 (1, 0, 0), Quaternion.identity) as GameObject;
+					go.GetComponent<Rigidbody2D> ().AddForce (new Vector2 (500, 500));
+				}
+				Destroy (transform.Find ("BallParticle(Clone)").gameObject);
+				iHaveTheBall = false;
+			}
+			//Ha nincs nálunk a labda és jelezve van, hogy ki tudom ütni akkor üssük ki a másiktól a labdát
+			else if(!iHaveTheBall && canKick){
+				GameObject go;
+				kickTime = 0;
+				canKick = false;
+				//Ha kiütöttük akkor már nincs a másiknál a labda
+				Player_r.GetComponent<Player_R_Controller> ().iHaveTheBall = false;
+				//Random erő az ütéshez
+				Vector2 randomForce = new Vector2 (Random.Range (-250, 250), Random.Range (400, 1000));
+				Vector3 otherPlayerPos = otherPlayer.transform.position;
+				//Most a labda ott fog teremni ahol a másik játékos van
+				go = Instantiate (ballGo, otherPlayerPos + new Vector3 (0, 1f, 0), Quaternion.identity) as GameObject;
+				//Az előzőleg kitalált erővel elütjük
+				go.GetComponent<Rigidbody2D> ().AddForce (randomForce);
+				//Meg is kell semmisíteni a jelző particle-t
+				Destroy(GameObject.FindGameObjectWithTag("BallParticle"));
+			}
 		}
-		yield return new WaitForSeconds (1);
 	}
 
 }
