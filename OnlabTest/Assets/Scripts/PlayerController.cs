@@ -41,10 +41,12 @@ public class PlayerController : MonoBehaviour {
 	private RaycastHit2D materialCheckBase;
 	public LayerMask materialCheckMask;
 
+	//Nálunk van e a labda vagy nem
 	public bool iHaveTheBall = false;
+	//Ez csökken amikor nálunk van
 	private int ballHoldTime = 100;
 	float timeCount;
-	public int kickTime = 5;
+	public int kickTime = 10;
 	public bool canKick = false;
 
 	//Ez jelzi hogy kinél van a labda
