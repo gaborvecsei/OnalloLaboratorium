@@ -43,8 +43,15 @@ public class PlayerController : MonoBehaviour {
 
 	//Nálunk van e a labda vagy nem
 	public bool iHaveTheBall = false;
-	//Ez csökken amikor nálunk van
-	private int ballHoldTime = 100;
+
+	//Ez nő amikor nálunk van
+	private int ballHoldTime = 0;
+	public int BallHoldTime
+	{
+		get { return ballHoldTime; }
+		set { ballHoldTime = value; }
+	}
+
 	float timeCount;
 	public int kickTime = 10;
 	public bool canKick = false;
@@ -108,7 +115,7 @@ public class PlayerController : MonoBehaviour {
 		//Visszaszámol másodpercenként amíg nálunk van a labda
 		if(iHaveTheBall && Time.time >= (timeCount+1f)){
 			timeCount = Time.time;
-			ballHoldTime--;
+			ballHoldTime++;
 			//Debug.Log (gameObject.name + ": " + ballHoldTime);
 
 		}

@@ -22,7 +22,6 @@ public class BoxSpawningController : MonoBehaviour {
 
 	//Ezzel hozzuk létre az új dobozt amiben valamilyen erő van
 	void BoxSpawning(){
-		Debug.Log ("WOW, NEW BOX!");
 		//Random pozícióba generálása
 		float rndXPos = Random.Range (spwPosXMin, spwPosXMax);
 		//Random pozícióba dobjuk le de olyan magasságból ahol a Spawner GameObject van (nem látható)
@@ -34,7 +33,6 @@ public class BoxSpawningController : MonoBehaviour {
 		//Létrehozása az új GameObject-nek
 		GameObject go = Instantiate (boxPref, dropPos, Quaternion.identity) as GameObject;
 		activeBoxesList.Add (go);
-		Debug.Log (activeBoxesList.Count);
 		//Ha túl sok doboz lennea pályán lent
 		DestroyOldBox();
 		//Indulhat újra a visszaszámlálás
