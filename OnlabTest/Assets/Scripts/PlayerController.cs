@@ -5,14 +5,19 @@ using System.Collections;
 
 public class PlayerController : MonoBehaviour {
 
+	//Játékos mozgási sebessége
     private float maxSpeed = 5f;
-
 	public float MaxSpeed
 	{
 		get { return maxSpeed;}
 		set { maxSpeed = value;}
 	}
-
+	//X irányú elmozdulása a játékosnak
+	private float moveX = 0f;
+	public float MoveX{
+		get { return moveX;}
+		set { moveX = value;}
+	}
     //Merre néz a játékos
     protected bool faceingLeft = true;
     //A talajjal érintkezik e
@@ -23,51 +28,66 @@ public class PlayerController : MonoBehaviour {
     public LayerMask whatIsGround;
     //Milyen erővel ugorjon el a játékos
     private float jumpForce = 600f;
-
     public float JumpForce
     {
         get { return jumpForce; }
         set { jumpForce = value; }
     }
+	//Ha true akkor ugrás van
+	private bool jumping = false;
+	public bool Jumping {
+		get {return jumping;}
+		set {jumping = value;}
+	}
 
 	[HideInInspector]
 	public Rigidbody2D rb;
-	//X irányú elmozdulása a játékosnak
-	private float moveX = 0f;
-	//Ha true akkor ugrás van
-	private bool jumping = false;
-
 	//Megnézi, hogy milyen fajta platformon vagyunk: (normális, csúszós, ragadós stb)
 	private RaycastHit2D materialCheckBase;
 	public LayerMask materialCheckMask;
-
 	//Nálunk van e a labda vagy nem
 	public bool iHaveTheBall = false;
-
-	//Ez nő amikor nálunk van
+	//Ez nő amikor nálunk van a labda
 	private int ballHoldTime = 0;
 	public int BallHoldTime
 	{
 		get { return ballHoldTime; }
 		set { ballHoldTime = value; }
 	}
-
-	float timeCount;
+	//Számlálók
+	float timeCount_hold;
+	float timeCount_kick;
+	//Ennyi időnek kell eltelnie 2 ütés között
 	public int kickTime = 10;
+	//Mikor true lesz akkor lehet a másiktól elütni a labdát
 	public bool canKick = false;
-
 	//Ez jelzi hogy kinél van a labda
 	public GameObject ballParticle;
 	public GameObject ballGo;
 
-	protected GameObject Player_r;
-	protected GameObject Player_b;
+	protected GameObject player_r;
+	protected GameObject player_b;
+	private GameObject otherPlayer;
+
+	//private string[] powerUps = { "Speed", "FreezeTime", "HighJump" };
+	private string[] powerUps = { "FreezeTime", "FreezeTime", "FreezeTime" };
+	public string powerUp = "None";
+	public bool gotPowerUp = false;
+	private float timeCount_powerUp;
+	public int powerUpTime = 0;
 
 	void Start()
 	{
+		player_r = GameObject.Find ("Player_r");
+		player_b = GameObject.Find ("Player_b");
 		rb = GetComponent<Rigidbody2D> ();
-		Player_b = GameObject.Find ("Player_b");
-		Player_r = GameObject.Find ("Player_r");
+		//Megnézi, hogy mi kik vagyunk és 
+		string myName = this.gameObject.name;
+		if (myName == "Player_r")
+			otherPlayer = player_b;
+		else
+			otherPlayer = player_r;
+
 	}
 
     //A sprite a másik irányba nézését oldja meg
@@ -79,16 +99,17 @@ public class PlayerController : MonoBehaviour {
         transform.localScale = theScale;
     }
 
-	//Azt figyeli, hogy mi a bemenet
-	//A leszármazottaknál be lehet állítani, hogy mit figyeljen bemenetnek
-	public virtual float MovementX(){
-		float move = Input.GetAxis ("Horizontal_b");
+	//Az X irányú mozgatást figyeli
+	//Ez a metódus van meghívva a különböző színű játékosoknál
+	public float MovementX(string inputButton){
+		float move = Input.GetAxis (inputButton);
 		return move;
 	}
 
-	//Az ugrás detektálásáért (Inputjáért) felelős
-	public virtual bool Jumping(){
-		bool jump = Input.GetButtonDown ("Jump_b");
+	//Az ugrást figyeli
+	//Ez a metódus van meghívva a különböző színű játékosoknál
+	public bool IsJumping(string inputButton){
+		bool jump = Input.GetButtonDown (inputButton);
 		return jump;
 	}
 		
@@ -97,33 +118,39 @@ public class PlayerController : MonoBehaviour {
 	public void Update()
 	{
 		isGrounded = Physics2D.OverlapCircle (groundcheck.transform.position, 0.3f, whatIsGround);
-		//Beolvassuk az X irányú elmozdulásokat
-		moveX = MovementX ();
 		//Mindig oda nézzen amerre megy
-		if (moveX > 0 && faceingLeft)
+		if (MoveX > 0 && faceingLeft)
 		{
 			Flip ();
 		}
-		else if (moveX < 0 && !faceingLeft)
+		else if (MoveX < 0 && !faceingLeft)
 		{
 			Flip ();
 		}
-
-		//Ha megnyomtuk az ugrás gombot akkor ugorhatun
-		jumping = Jumping ();
 
 		//Visszaszámol másodpercenként amíg nálunk van a labda
-		if(iHaveTheBall && Time.time >= (timeCount+1f)){
-			timeCount = Time.time;
+		if(iHaveTheBall && Time.time >= (timeCount_hold+1f)){
+			timeCount_hold = Time.time;
 			ballHoldTime++;
 			//Debug.Log (gameObject.name + ": " + ballHoldTime);
 
 		}
 
-		if (!iHaveTheBall && Time.time >= (timeCount+1f) && kickTime < 10) {
-			timeCount = Time.time;
+		if (!iHaveTheBall && Time.time >= (timeCount_kick+1f) && kickTime < 10) {
+			timeCount_kick = Time.time;
 			kickTime++;
 			//Debug.Log (gameObject.name + ": " + kickTime);
+		}
+
+		//5 sec elteltével már elmúlik az erő
+		if (gotPowerUp && Time.time >= (timeCount_powerUp + 1f)) {
+			timeCount_powerUp = Time.time;
+			powerUpTime--;
+			//Ha túllépi az idő korlátot
+			if (powerUpTime < 0) {
+				ResetPower ();
+				powerUpTime = 5;
+			}
 		}
 	}
 
@@ -158,15 +185,15 @@ public class PlayerController : MonoBehaviour {
 		//Hogyha nincs alattunk semmi, de jobbról vagy balról igen, akkor biztosra vehetjük, hogy egy platform szélén állunk
 		if ((materialCheckBase.collider == null && materialCheckRight.collider != null)
 			|| (materialCheckBase.collider == null && materialCheckLeft.collider != null)) {
-			rb.AddForce (new Vector2 (moveX * MaxSpeed, 0));
+			rb.AddForce (new Vector2 (MoveX * MaxSpeed, 0));
 		}else if ((materialCheckBase.collider != null) && (materialCheckBase.collider.tag == "NormalGround")) {
 			//Ha sima platformon állunk akkor nem kell erőbehatás
-			rb.velocity = new Vector2 (moveX * MaxSpeed, rb.velocity.y);
+			rb.velocity = new Vector2 (MoveX * MaxSpeed, rb.velocity.y);
 		} else if ((materialCheckBase.collider != null) && (materialCheckBase.collider.tag == "SlipperyGround")) {
 			//Viszont ha csúszós platformon állunk akkor kell erő hatás, mivel így érvényesül a Physics material
-			rb.AddForce (new Vector2 (moveX * MaxSpeed, 0));
+			rb.AddForce (new Vector2 (MoveX * MaxSpeed, 0));
 		} else {
-			rb.velocity = new Vector2 (moveX * MaxSpeed, rb.velocity.y);
+			rb.velocity = new Vector2 (MoveX * MaxSpeed, rb.velocity.y);
 		}
 	}
 
@@ -182,8 +209,62 @@ public class PlayerController : MonoBehaviour {
 			//Beállítjuk, hogy a gyereke legyen a játékosnak így a pozíciójuk meg fog egyezni, és együtt mozognak majd
 			go.transform.parent = this.transform;
 		}
+
+		//Mikor egy erőt tartalmazó dobozzal ütközünk
+		if (coll.gameObject.tag == "Box") {
+			Destroy (coll.gameObject);
+			powerUp = GenerateRandomPower ();
+		}
 	}
 
+	//Miután felszedtük a dobozt ez generál nekünk valamilyen erőt
+	public string GenerateRandomPower(){
+		string power = powerUps [Random.Range (0, powerUps.Length)];
+		return power;
+	}
+
+	//Leellenőrzi, hogy milyen erő van nálunk és a szerint cselekszik
+	//Az időt amíg az erő megvan azt külön külön állíthatjuk be
+	public void CheckMyPowerUp(){
+		switch (powerUp){
+		case "Speed":
+			MaxSpeed = 10f;
+			powerUpTime = 5;
+			break;
+		case "FreezeTime":
+			//A másik játékos számára megállítja az időt
+			otherPlayer.GetComponent<Rigidbody2D> ().constraints = RigidbodyConstraints2D.FreezeAll;
+			powerUpTime = 10;
+			break;
+		case "HighJump":
+			//Nagyobbat tud ugrani
+			JumpForce = 850f;
+			powerUpTime = 5;
+			break;
+		default:
+			MaxSpeed = 5f;
+			JumpForce = 600f;
+			otherPlayer.GetComponent<Rigidbody2D> ().constraints = RigidbodyConstraints2D.FreezeRotation;
+			break;
+		}
+	}
+
+	//Reset the thing to the default
+	public void ResetPower(){
+		gotPowerUp = false;
+		MaxSpeed = 5f;
+		JumpForce = 600f;
+		powerUp = "None";
+		otherPlayer.GetComponent<Rigidbody2D> ().constraints = RigidbodyConstraints2D.FreezeRotation;
+	}
+
+	//Ha van PowerUp-unk és lenyomjuk a gombot akkor használjuk csak el
+	public void UsePowerUp(string inputStr){
+		if (Input.GetButtonDown (inputStr) && powerUp != "None") {
+			gotPowerUp = true;
+			CheckMyPowerUp ();
+		}
+	}
 
 	//A labda eldobásáért és a kiütéséért felelős metódus
 	public void KickAndThrow(string inputStr, GameObject otherPlayer){
