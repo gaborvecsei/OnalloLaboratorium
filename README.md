@@ -25,13 +25,9 @@ Két játékos van akiket irányíthatunk:
 ##Kapcsolat
 
 Vecsei Gábor
-
 mailto:vecseigabor.x@gmail.com
-
 [Personal Blog][1]
-
 [Repos][2]
-
 2016 február
 
 [1]: http://gaborvecsei.wordpress.com
