@@ -17,12 +17,17 @@ Például: gyorsaság, magasabb ugrás, másik játékos megfagyasztása.
 
 Két játékos van akiket irányíthatunk:
 
-| Tables        | Moving        | Kick Ball/Throw Ball | Use Power Up |
+| Players       | Moving        | Kick Ball/Throw Ball | Use Power Up |
 | ------------- |:-------------:| --------------------:|-------------:|
 | Blue Player   | W,A,S,D       |           E          |      Q       |
 | Red Player    | I,J,K,L       |           U          |      O       |
 
 
+| Players     | Moving | Kick Ball/Throw Ball | Use Power Up |   |
+|-------------|--------|----------------------|--------------|---|
+| Blue Player |        |                      |              |   |
+| Red Player  |        |                      |              |   |
+|             |        |                      |              |   |
 ##Kapcsolat
 
 Vecsei Gábor
