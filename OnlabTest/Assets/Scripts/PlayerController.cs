@@ -68,13 +68,13 @@ public class PlayerController : MonoBehaviour {
 	protected GameObject player_r;
 	protected GameObject player_b;
 	private GameObject otherPlayer;
-
-	//private string[] powerUps = { "Speed", "FreezeTime", "HighJump" };
-	private string[] powerUps = { "FreezeTime", "FreezeTime", "FreezeTime" };
-	public string powerUp = "None";
-	public bool gotPowerUp = false;
+	//Power up-ok listája
+	private string[] powerUps = { "Speed", "FreezeTime", "HighJump" };
+	//Aktuális power up amivel rendelkezik
+	private string powerUp = "None";
+	private bool gotPowerUp = false;
 	private float timeCount_powerUp;
-	public int powerUpTime = 0;
+	private int powerUpTime = 0;
 
 	void Start()
 	{
@@ -142,7 +142,7 @@ public class PlayerController : MonoBehaviour {
 			//Debug.Log (gameObject.name + ": " + kickTime);
 		}
 
-		//5 sec elteltével már elmúlik az erő
+		//X sec elteltével már elmúlik az erő
 		if (gotPowerUp && Time.time >= (timeCount_powerUp + 1f)) {
 			timeCount_powerUp = Time.time;
 			powerUpTime--;
@@ -197,7 +197,10 @@ public class PlayerController : MonoBehaviour {
 		}
 	}
 
-	//Ütközés detektálása
+	/// <summary>
+	/// Raises the collision enter2 d event.
+	/// </summary>
+	/// <param name="coll">Coll.</param>
 	void OnCollisionEnter2D(Collision2D coll){
 		//Ha a labdával ütközünk
 		if (coll.gameObject.tag == "Ball") {
@@ -217,29 +220,35 @@ public class PlayerController : MonoBehaviour {
 		}
 	}
 
-	//Miután felszedtük a dobozt ez generál nekünk valamilyen erőt
+	/// <summary>
+	/// Generál egy erőt miután felszedtük egy dobozt
+	/// </summary>
+	/// <returns>Random Power Up</returns>
 	public string GenerateRandomPower(){
 		string power = powerUps [Random.Range (0, powerUps.Length)];
 		return power;
 	}
-
-	//Leellenőrzi, hogy milyen erő van nálunk és a szerint cselekszik
-	//Az időt amíg az erő megvan azt külön külön állíthatjuk be
+		
+	/// <summary>
+	/// Leellenőrzi, hogy milyen erő van nálunk és a szerint
+	/// cselekszik. Minden erőhöz, meg van adva hogy mit tesz, és külön
+	/// beállítható az az idő amíg "él" egy erő a játékosnál.
+	/// </summary>
 	public void CheckMyPowerUp(){
 		switch (powerUp){
 		case "Speed":
 			MaxSpeed = 10f;
-			powerUpTime = 5;
+			powerUpTime = 6;
 			break;
 		case "FreezeTime":
 			//A másik játékos számára megállítja az időt
 			otherPlayer.GetComponent<Rigidbody2D> ().constraints = RigidbodyConstraints2D.FreezeAll;
-			powerUpTime = 10;
+			powerUpTime = 5;
 			break;
 		case "HighJump":
 			//Nagyobbat tud ugrani
 			JumpForce = 850f;
-			powerUpTime = 5;
+			powerUpTime = 7;
 			break;
 		default:
 			MaxSpeed = 5f;
@@ -249,7 +258,9 @@ public class PlayerController : MonoBehaviour {
 		}
 	}
 
-	//Reset the thing to the default
+	/// <summary>
+	/// Reseteli a Power Upot, minden default lesz
+	/// </summary>
 	public void ResetPower(){
 		gotPowerUp = false;
 		MaxSpeed = 5f;
@@ -258,7 +269,11 @@ public class PlayerController : MonoBehaviour {
 		otherPlayer.GetComponent<Rigidbody2D> ().constraints = RigidbodyConstraints2D.FreezeRotation;
 	}
 
-	//Ha van PowerUp-unk és lenyomjuk a gombot akkor használjuk csak el
+	/// <summary>
+	/// Amikor van Powe Up-unk akkor használhatjuk el.
+	/// Ezt a függvényt minden játékos a saját osztályában hívja meg a saját inputtal
+	/// </summary>
+	/// <param name="inputStr">Editorban beállított input gomb</param>
 	public void UsePowerUp(string inputStr){
 		if (Input.GetButtonDown (inputStr) && powerUp != "None") {
 			gotPowerUp = true;
@@ -266,8 +281,13 @@ public class PlayerController : MonoBehaviour {
 		}
 	}
 
-	//A labda eldobásáért és a kiütéséért felelős metódus
-	public void KickAndThrow(string inputStr, GameObject otherPlayer){
+	/// <summary>
+	/// A labda eldobásáért feleős. Ezzel a játékosok el tudják dobni a labdát vagy
+	/// pedig ki tudják ütni a másiktól (gyan azzal a gombbal)
+	/// Ezt a függvényt hívja meg mindegyik játékos a "saját" class-ában, a saját inputjával 
+	/// </summary>
+	/// <param name="inputStr">Editorban beállított input gomb</param>
+	public void KickAndThrow(string inputStr){
 		if (Input.GetButtonDown (inputStr)) {
 			if (iHaveTheBall) {
 				GameObject go;
@@ -282,7 +302,7 @@ public class PlayerController : MonoBehaviour {
 				iHaveTheBall = false;
 			}
 			//Ha nincs nálunk a labda és jelezve van, hogy ki tudom ütni akkor üssük ki a másiktól a labdát
-			else if(!iHaveTheBall && canKick){
+			else if (!iHaveTheBall && canKick) {
 				GameObject go;
 				kickTime = 0;
 				canKick = false;
@@ -296,7 +316,7 @@ public class PlayerController : MonoBehaviour {
 				//Az előzőleg kitalált erővel elütjük
 				go.GetComponent<Rigidbody2D> ().AddForce (randomForce);
 				//Meg is kell semmisíteni a jelző particle-t
-				Destroy(GameObject.FindGameObjectWithTag("BallParticle"));
+				Destroy (GameObject.FindGameObjectWithTag ("BallParticle"));
 			}
 		}
 	}

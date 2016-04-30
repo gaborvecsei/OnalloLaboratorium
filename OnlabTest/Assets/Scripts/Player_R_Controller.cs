@@ -6,7 +6,7 @@ public class Player_R_Controller : PlayerController {
 	void Update(){
 		//Mindenképp meg kell hívni az alap Update-et hogy mozoghassunk, ugorhassunk stb...
 		base.Update ();
-		KickAndThrow("Kiutes_r",player_b);
+		KickAndThrow("Kiutes_r");
 		MoveX = MovementX ("Horizontal_r");
 		Jumping = IsJumping ("Jump_r");
 		UsePowerUp ("EroHasznalas_r");
