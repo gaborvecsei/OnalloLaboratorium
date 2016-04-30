@@ -23,11 +23,10 @@ Két játékos van akiket irányíthatunk:
 | Red Player    | I,J,K,L       |           U          |      O       |
 
 
-| Players     | Moving | Kick Ball/Throw Ball | Use Power Up |   |
-|-------------|--------|----------------------|--------------|---|
-| Blue Player |        |                      |              |   |
-| Red Player  |        |                      |              |   |
-|             |        |                      |              |   |
+| Players     | Moving  | Kick Ball/Throw Ball | Use Power Up |
+|-------------|---------|----------------------|--------------|
+| Blue Player | W,A,S,D | E                    | Q            |
+| Red Player  | I,J,K,L | U                    | O            |
 ##Kapcsolat
 
 Vecsei Gábor
