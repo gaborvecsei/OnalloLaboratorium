@@ -26,7 +26,7 @@ Két játékos van akiket irányíthatunk:
 
 Vecsei Gábor
 
-mailto:vecseigabor.x@gmail.com
+<mailto:vecseigabor.x@gmail.com>
 
 [Personal Blog][1]
 
