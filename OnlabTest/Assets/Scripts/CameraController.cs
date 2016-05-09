@@ -1,11 +1,15 @@
 ﻿using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
 
 [RequireComponent (typeof (Camera))]
 [RequireComponent (typeof (RectTransform))]
 
 public class CameraController : MonoBehaviour {
 
+	[HideInInspector]
 	public Transform[] targets;
+	public ArrayList targets2 = new ArrayList();
 	public float boundingBoxPadding = 2f;
 	public float minimumOrthographicSize = 8f;
 	public float zoomSpeed = 20f;
@@ -22,7 +26,7 @@ public class CameraController : MonoBehaviour {
 
 	Camera camera;
 
-	void Awake () 
+	void Awake ()
 	{
 		camera = GetComponent<Camera>();
 		camera.orthographic = true;
@@ -49,7 +53,7 @@ public class CameraController : MonoBehaviour {
 		float minY = Mathf.Infinity;
 		float maxY = Mathf.NegativeInfinity;
 
-		foreach (Transform target in targets) {
+		foreach (Transform target in targets2) {
 			Vector3 position = target.position;
 
 			minX = Mathf.Min(minX, position.x);
@@ -60,7 +64,11 @@ public class CameraController : MonoBehaviour {
 		return Rect.MinMaxRect(minX - boundingBoxPadding, maxY + boundingBoxPadding, maxX + boundingBoxPadding, minY - boundingBoxPadding);
 	}
 
-	//A camera pozícióját számolja ki, azaz annak közép pontját, hogy hol legyen
+	/// <summary>
+	/// A camera pozícióját számolja ki, azaz annak közép pontját, hogy hol legyen
+	/// </summary>
+	/// <returns>The position of the camera</returns>
+	/// <param name="boundingBox">Bounding box.</param>
 	Vector3 CalculateCameraPosition(Rect boundingBox)
 	{
 		Vector2 boundingBoxCenter = boundingBox.center;
@@ -81,7 +89,11 @@ public class CameraController : MonoBehaviour {
 		return newCameraPosition;
 	}
 
-	//A kamera ortografikus méretét számolja ki
+	/// <summary>
+	/// A kamera ortografikus méretét számolja ki
+	/// </summary>
+	/// <returns>The orthographic size.</returns>
+	/// <param name="boundingBox">Bounding box.</param>
 	float CalculateOrthographicSize(Rect boundingBox)
 	{
 		float orthographicSize = camera.orthographicSize;

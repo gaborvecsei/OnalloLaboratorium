@@ -1,8 +1,20 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
 
 [RequireComponent (typeof (Rigidbody2D))]
+[RequireComponent (typeof (Transform))]
+//Kell ahhoz, hogy a platformon maradjon
+[RequireComponent (typeof (BoxCollider2D))]
+//Kell ahhoz, hogy a másik játékostól ki tudja ütnia  labdát
+[RequireComponent (typeof (CircleCollider2D))]
 
+/// <summary>
+/// Játékosok "alap" osztálya.
+/// Itt kerül megvalósításra minden ami velük kapcsolatos,
+/// Ezután az itt megvalósított függvényeket hívják meg a saját osztájukban a saját
+/// inputjukkal.
+/// </summary>
 public class PlayerController : MonoBehaviour {
 
 	//Játékos mozgási sebessége
@@ -76,8 +88,23 @@ public class PlayerController : MonoBehaviour {
 	private float timeCount_powerUp;
 	private int powerUpTime = 0;
 
+	private GameObject mainCamera;
+	private Transform thisTransform;
+
+	//Editorban lehet hozzáadni
+	//Ezek jelennek meg amikr felvettünk egy erőt
+	public Sprite powerUpSprt_speed;
+	public Sprite powerUpSprt_highjump;
+	public Sprite powerUpSprt_freezetime;
+	public Image powerUpImage;
+
+
+	/// <summary>
+	/// Start this instance.
+	/// </summary>
 	void Start()
 	{
+		mainCamera = GameObject.Find ("Main Camera");
 		player_r = GameObject.Find ("Player_r");
 		player_b = GameObject.Find ("Player_b");
 		rb = GetComponent<Rigidbody2D> ();
@@ -87,10 +114,18 @@ public class PlayerController : MonoBehaviour {
 			otherPlayer = player_b;
 		else
 			otherPlayer = player_r;
+		
+		//A játékosok saját magukat adják hozzá a listához
+		thisTransform = GetComponent<Transform> ();
+		mainCamera.GetComponent<CameraController> ().targets2.Add (thisTransform);
+		powerUpImage = powerUpImage.GetComponent<Image> ();
+		powerUpImage.enabled = false;
 
 	}
 
-    //A sprite a másik irányba nézését oldja meg
+    /// <summary>
+	/// A sprite a másik irányba nézését oldja meg
+    /// </summary>
     void Flip()
     {
         faceingLeft = !faceingLeft;
@@ -98,23 +133,34 @@ public class PlayerController : MonoBehaviour {
         theScale.x *= -1;
         transform.localScale = theScale;
     }
-
-	//Az X irányú mozgatást figyeli
-	//Ez a metódus van meghívva a különböző színű játékosoknál
+		
+	/// <summary>
+	/// Az X irányú mozgatást figyeli
+	/// Ez a metódus van meghívva a különböző színű játékosoknál
+	/// </summary>
+	/// <returns>Value of movement</returns>
+	/// <param name="inputButton">játékos Input button-ja</param>
 	public float MovementX(string inputButton){
 		float move = Input.GetAxis (inputButton);
 		return move;
 	}
-
-	//Az ugrást figyeli
-	//Ez a metódus van meghívva a különböző színű játékosoknál
+		
+	/// <summary>
+	/// Az ugrást figyeli.
+	/// Ez a metódus van meghívva a különböző színű játékosoknál.
+	/// </summary>
+	/// <returns><c>true</c> ha ugrik éppen a játékos, egyébként <c>false</c>.</returns>
+	/// <param name="inputButton">Input button.</param>
 	public bool IsJumping(string inputButton){
 		bool jump = Input.GetButtonDown (inputButton);
 		return jump;
 	}
 		
-	//Inputot kezeli és ami nem a fizikával kapcsolatos
-	//publikussá tettem, hogy a leszármazottak is lássák, és meg tudják hívni
+	/// <summary>
+	/// Inputot kezeli és ami nem a fizikával kapcsolatos.
+	/// Publikussá tettem, hogy a leszármazottak is lássák, és meg tudják hívni.
+	/// 
+	/// </summary>
 	public void Update()
 	{
 		isGrounded = Physics2D.OverlapCircle (groundcheck.transform.position, 0.3f, whatIsGround);
@@ -154,7 +200,9 @@ public class PlayerController : MonoBehaviour {
 		}
 	}
 
-	//Fizikai része van ebben benne
+	/// <summary>
+	/// Fizikai rész van ebben
+	/// </summary>
 	void FixedUpdate()
 	{
 		//Ugrik a játékos
@@ -169,7 +217,10 @@ public class PlayerController : MonoBehaviour {
 
 	}
 
-	//A játékos mozgatása, úgy hogy figyelembe veszi a platformok anyagát (kell hozzá a MovementX())
+	/// <summary>
+	/// A játékos mozgatása, úgy hogy figyelembe veszi
+	/// a platformok anyagát (kell hozzá a MovementX())
+	/// </summary>
 	private void Mooving(){
 		//Megnézi, hogy milyen fajta talaj van alatta RayCasttal
 		float raycastDistance = 0.8f;
@@ -198,7 +249,7 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	/// <summary>
-	/// Raises the collision enter2 d event.
+	/// Raises the collision enter2 event.
 	/// </summary>
 	/// <param name="coll">Coll.</param>
 	void OnCollisionEnter2D(Collision2D coll){
@@ -218,6 +269,31 @@ public class PlayerController : MonoBehaviour {
 			Destroy (coll.gameObject);
 			powerUp = GenerateRandomPower ();
 		}
+
+		//Ha leesünk a lyukba
+		if (coll.gameObject.tag == "Hole") {
+			//Ha van nálunk labda akkor elejtjük
+			DropTheBall ();
+			StartCoroutine (WaitForRespawn());
+		}
+	}
+
+	/// <summary>
+	/// Kiveszi magát a kamera listájából, hogy őt ne kövesse,
+	/// Kiszámolja  a random újraéledési helyet,
+	/// Az idő letelte után beállítja a pozícióját az új helyre és
+	/// Újra hozzáadja megát a kamera listájához.
+	/// </summary>
+	IEnumerator WaitForRespawn(){
+		gameObject.GetComponent<SpriteRenderer> ().enabled = false;
+		mainCamera.GetComponent<CameraController> ().targets2.Remove (thisTransform);
+		float waitTime = 3.0f;
+		float rndXPos = Random.Range (9.0f, -9.0f);
+		float YPos = 5.0f;
+		yield return new WaitForSeconds (waitTime);
+		transform.position = new Vector2 (rndXPos, YPos);
+		gameObject.GetComponent<SpriteRenderer> ().enabled = true;
+		mainCamera.GetComponent<CameraController> ().targets2.Add (thisTransform);
 	}
 
 	/// <summary>
@@ -226,6 +302,27 @@ public class PlayerController : MonoBehaviour {
 	/// <returns>Random Power Up</returns>
 	public string GenerateRandomPower(){
 		string power = powerUps [Random.Range (0, powerUps.Length)];
+		/*switch (power) {
+		case "Speed":
+			powerUpImage.sprite = powerUpSprt_speed;
+			break;
+		case "FreezeTime":
+			powerUpImage.sprite = powerUpSprt_freezetime;
+			break;
+		case "HighJump":
+			powerUpImage.sprite = powerUpSprt_highjump;
+			break;
+		default:
+			powerUpImage.enabled = false;
+		}*/
+		powerUpImage.enabled = true;
+		if (power == "Speed") {
+			powerUpImage.sprite = powerUpSprt_speed;
+		} else if (power == "HighJump") {
+			powerUpImage.sprite = powerUpSprt_highjump;
+		} else if (power == "FreezeTime") {
+			powerUpImage.sprite = powerUpSprt_freezetime;
+		}
 		return power;
 	}
 		
@@ -235,10 +332,12 @@ public class PlayerController : MonoBehaviour {
 	/// beállítható az az idő amíg "él" egy erő a játékosnál.
 	/// </summary>
 	public void CheckMyPowerUp(){
+		//Mivel felhasználtuk így már nem kell megjeleníteni
+		powerUpImage.enabled = false;
 		switch (powerUp){
 		case "Speed":
 			MaxSpeed = 10f;
-			powerUpTime = 6;
+			powerUpTime = 7;
 			break;
 		case "FreezeTime":
 			//A másik játékos számára megállítja az időt
@@ -267,6 +366,7 @@ public class PlayerController : MonoBehaviour {
 		JumpForce = 600f;
 		powerUp = "None";
 		otherPlayer.GetComponent<Rigidbody2D> ().constraints = RigidbodyConstraints2D.FreezeRotation;
+		powerUpImage.enabled = false;
 	}
 
 	/// <summary>
@@ -318,6 +418,26 @@ public class PlayerController : MonoBehaviour {
 				//Meg is kell semmisíteni a jelző particle-t
 				Destroy (GameObject.FindGameObjectWithTag ("BallParticle"));
 			}
+		}
+	}
+
+
+	/// <summary>
+	/// Ha mi birtokoljuk a labdát, akkor ezzel el lehet "ejteni"
+	/// (Olyan mintha a másik ütné ki tőlünk)
+	/// </summary>
+	public void DropTheBall(){
+		if (iHaveTheBall) {
+			GameObject go;
+			//Ha kiütöttük akkor már nincs a másiknál a labda
+			iHaveTheBall = false;
+			//Random erő az ütéshez
+			Vector2 randomForce = new Vector2 (Random.Range (-250, 250), Random.Range (400, 1000));
+			go = Instantiate (ballGo, transform.position + new Vector3 (0, 1f, 0), Quaternion.identity) as GameObject;
+			//Az előzőleg kitalált erővel elütjük
+			go.GetComponent<Rigidbody2D> ().AddForce (randomForce);
+			//Meg is kell semmisíteni a jelző particle-t
+			Destroy (GameObject.FindGameObjectWithTag ("BallParticle"));
 		}
 	}
 
