@@ -2,6 +2,13 @@
 using System.Collections;
 using System.Collections.Generic;
 
+/// <summary>
+/// Camera controller.
+/// Hozzáadhatunk egy listához gameobjectecet, hogy azoknak a 
+/// pozícióját belevéve kalkulálja ki saját pozícióják, így a
+/// listában lévő dolgok mindig látszanak a képernyőn.
+/// </summary>
+
 [RequireComponent (typeof (Camera))]
 [RequireComponent (typeof (RectTransform))]
 

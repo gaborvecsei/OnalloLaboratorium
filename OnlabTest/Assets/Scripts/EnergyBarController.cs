@@ -1,6 +1,11 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// Ez mutatja, hogy kinek mennyi pontja gyűlt össze,
+/// azaz, hogy meddig volt nála a labda.
+/// </summary>
+
 public class EnergyBarController: MonoBehaviour {
 
 	private GameObject player_r;

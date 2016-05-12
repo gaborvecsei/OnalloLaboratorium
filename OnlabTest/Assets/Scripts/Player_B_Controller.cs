@@ -15,7 +15,7 @@ public class Player_B_Controller : PlayerController {
 
 	//Mind a két játékosnál van egy trigger collider
 	//Ha azzal ütközünk és teljesülnek a feltételek, akkor kiüthetjük a labdát tőlük
-	void OnTriggerStay2D(Collider2D coll){
+	void OnTriggerStay(Collider2D coll){
 		if (!iHaveTheBall && kickTime == 10 && coll.gameObject.tag == "Player_r"
 		    && player_r.GetComponent<Player_R_Controller> ().iHaveTheBall == true) {
 			canKick = true;

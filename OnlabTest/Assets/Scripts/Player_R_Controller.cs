@@ -13,7 +13,7 @@ public class Player_R_Controller : PlayerController {
 	}
 
 
-	void OnTriggerStay2D(Collider2D coll){
+	void OnTriggerStay(Collider2D coll){
 		if (!iHaveTheBall && kickTime == 10 && coll.gameObject.tag == "Player_b"
 			&& player_b.GetComponent<Player_B_Controller>().iHaveTheBall == true) {
 			canKick = true;

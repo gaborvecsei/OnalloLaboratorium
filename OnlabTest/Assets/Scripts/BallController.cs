@@ -1,6 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+/// <summary>
+/// A labdának a controllere.
+/// Figyeli, hogy leesik e a labda és leesne akkor
+/// újraterem a pályán valahol random.
+/// </summary>
 
 [RequireComponent (typeof (Rigidbody2D))]
 [RequireComponent (typeof (CircleCollider2D))]

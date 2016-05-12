@@ -389,35 +389,42 @@ public class PlayerController : MonoBehaviour {
 	/// <param name="inputStr">Editorban beállított input gomb</param>
 	public void KickAndThrow(string inputStr){
 		if (Input.GetButtonDown (inputStr)) {
-			if (iHaveTheBall) {
-				GameObject go;
-				if (faceingLeft) {
-					go = Instantiate (ballGo, transform.position + new Vector3 (-1, 0, 0), Quaternion.identity) as GameObject;
-					go.GetComponent<Rigidbody2D> ().AddForce (new Vector2 (-500, 500));
-				} else {
-					go = Instantiate (ballGo, transform.position + new Vector3 (1, 0, 0), Quaternion.identity) as GameObject;
-					go.GetComponent<Rigidbody2D> ().AddForce (new Vector2 (500, 500));
-				}
-				Destroy (transform.Find ("BallParticle(Clone)").gameObject);
-				iHaveTheBall = false;
-			}
+			ThrowTheBall ();
 			//Ha nincs nálunk a labda és jelezve van, hogy ki tudom ütni akkor üssük ki a másiktól a labdát
-			else if (!iHaveTheBall && canKick) {
-				GameObject go;
-				kickTime = 0;
-				canKick = false;
-				//Ha kiütöttük akkor már nincs a másiknál a labda
-				otherPlayer.GetComponent<PlayerController> ().iHaveTheBall = false;
-				//Random erő az ütéshez
-				Vector2 randomForce = new Vector2 (Random.Range (-250, 250), Random.Range (400, 1000));
-				Vector3 otherPlayerPos = otherPlayer.transform.position;
-				//Most a labda ott fog teremni ahol a másik játékos van
-				go = Instantiate (ballGo, otherPlayerPos + new Vector3 (0, 1f, 0), Quaternion.identity) as GameObject;
-				//Az előzőleg kitalált erővel elütjük
-				go.GetComponent<Rigidbody2D> ().AddForce (randomForce);
-				//Meg is kell semmisíteni a jelző particle-t
-				Destroy (GameObject.FindGameObjectWithTag ("BallParticle"));
+		} else if (!iHaveTheBall && canKick) {
+				KickTheBall ();
 			}
+	}
+
+	void KickTheBall(){
+		GameObject go;
+		kickTime = 0;
+		canKick = false;
+		//Ha kiütöttük akkor már nincs a másiknál a labda
+		otherPlayer.GetComponent<PlayerController> ().iHaveTheBall = false;
+		//Random erő az ütéshez
+		Vector2 randomForce = new Vector2 (Random.Range (-250, 250), Random.Range (400, 1000));
+		Vector3 otherPlayerPos = otherPlayer.transform.position;
+		//Most a labda ott fog teremni ahol a másik játékos van
+		go = Instantiate (ballGo, otherPlayerPos + new Vector3 (0, 1f, 0), Quaternion.identity) as GameObject;
+		//Az előzőleg kitalált erővel elütjük
+		go.GetComponent<Rigidbody2D> ().AddForce (randomForce);
+		//Meg is kell semmisíteni a jelző particle-t
+		Destroy(otherPlayer.transform.Find("BallParticle(Clone)").gameObject);
+	}
+
+	void ThrowTheBall(){
+		if (iHaveTheBall) {
+			GameObject go;
+			if (faceingLeft) {
+				go = Instantiate (ballGo, transform.position + new Vector3 (-1, 0, 0), Quaternion.identity) as GameObject;
+				go.GetComponent<Rigidbody2D> ().AddForce (new Vector2 (-500, 500));
+			} else {
+				go = Instantiate (ballGo, transform.position + new Vector3 (1, 0, 0), Quaternion.identity) as GameObject;
+				go.GetComponent<Rigidbody2D> ().AddForce (new Vector2 (500, 500));
+			}
+			Destroy (transform.Find ("BallParticle(Clone)").gameObject);
+			iHaveTheBall = false;
 		}
 	}
 

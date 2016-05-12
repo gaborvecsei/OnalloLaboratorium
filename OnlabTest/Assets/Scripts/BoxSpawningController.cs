@@ -1,6 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+/// <summary>
+/// A dobozok leeséséért felelős script.
+/// Beállíthatjuk, hogy milyen gyakran eshet le egy doboz és hogy
+/// mennyi tartózkodhat egyszerre a pályán.
+/// </summary>
+
 public class BoxSpawningController : MonoBehaviour {
 
 	//A scene-n belül hol jelenhet meg
