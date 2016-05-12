@@ -389,11 +389,13 @@ public class PlayerController : MonoBehaviour {
 	/// <param name="inputStr">Editorban beállított input gomb</param>
 	public void KickAndThrow(string inputStr){
 		if (Input.GetButtonDown (inputStr)) {
-			ThrowTheBall ();
-			//Ha nincs nálunk a labda és jelezve van, hogy ki tudom ütni akkor üssük ki a másiktól a labdát
-		} else if (!iHaveTheBall && canKick) {
+			if (iHaveTheBall) {
+				ThrowTheBall ();
+			} else if (!iHaveTheBall && canKick) {
+				//Ha nincs nálunk a labda és jelezve van, hogy ki tudom ütni akkor üssük ki a másiktól a labdát
 				KickTheBall ();
 			}
+		}
 	}
 
 	void KickTheBall(){
@@ -414,7 +416,6 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	void ThrowTheBall(){
-		if (iHaveTheBall) {
 			GameObject go;
 			if (faceingLeft) {
 				go = Instantiate (ballGo, transform.position + new Vector3 (-1, 0, 0), Quaternion.identity) as GameObject;
@@ -425,7 +426,6 @@ public class PlayerController : MonoBehaviour {
 			}
 			Destroy (transform.Find ("BallParticle(Clone)").gameObject);
 			iHaveTheBall = false;
-		}
 	}
 
 

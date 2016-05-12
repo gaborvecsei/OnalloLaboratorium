@@ -54,6 +54,10 @@ public class GameManager : MonoBehaviour {
 			//Megnézzük, hogy ki a nyertes
 			CheckTheWinner ();
 		}
+
+		if (Input.GetKeyDown (KeyCode.G)) {
+			Application.LoadLevel ("MainScene");
+		}
 	}
 
 	/// <summary>
