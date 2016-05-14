@@ -14,7 +14,8 @@ public class GameManager : MonoBehaviour {
 	public Text winnerLabel;
 	public Text restartLabel;
 	//Játékidő - 200másodperc
-	int gameTime = 200;
+	public static int gameTime = 200;
+	public static int maxBallHoldTime = 100;
 	float timeCount = 0f;
 	public GameObject player_r;
 	public GameObject player_b;
@@ -39,9 +40,9 @@ public class GameManager : MonoBehaviour {
 		score_b =player_b.GetComponent<PlayerController> ().BallHoldTime;
 
 		//Közben folyton figyeljük, hogy nyert e már valaki
-		if (score_r >= 100) {
+		if (score_r >= maxBallHoldTime) {
 			showWinnerText ("RED", red);
-		} else if (score_b >= 100) {
+		} else if (score_b >= maxBallHoldTime) {
 			showWinnerText ("BLUE", blue);
 		}
 
@@ -55,7 +56,7 @@ public class GameManager : MonoBehaviour {
 			CheckTheWinner ();
 		}
 
-		if (Input.GetKeyDown (KeyCode.G)) {
+		if (Input.GetKeyDown (KeyCode.R)) {
 			Application.LoadLevel ("MainScene");
 		}
 	}

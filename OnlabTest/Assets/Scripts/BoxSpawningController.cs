@@ -22,7 +22,7 @@ public class BoxSpawningController : MonoBehaviour {
 
 
 	void Start () {
-		StartCoroutine (WaitForSpawn ());
+		StartCoroutine (WaitForSpawn (1,3));
 	}
 
 	//Ezzel hozzuk létre az új dobozt amiben valamilyen erő van
@@ -39,15 +39,15 @@ public class BoxSpawningController : MonoBehaviour {
 		GameObject go = Instantiate (boxPref, dropPos, Quaternion.identity) as GameObject;
 		activeBoxesList.Add (go);
 		//Ha túl sok doboz lennea pályán lent
-		DestroyOldBox();
+		DestroyOldBox(3);
 		//Indulhat újra a visszaszámlálás
-		StartCoroutine (WaitForSpawn ());
+		StartCoroutine (WaitForSpawn (25, 40));
 
 	}
 
 	//Megelőzi, hogy túl sok Box legyen a scene-n
-	void DestroyOldBox(){
-		if (activeBoxesList.Count >= 4) {
+	void DestroyOldBox(int boxCount){
+		if (activeBoxesList.Count > boxCount) {
 			int listSize = activeBoxesList.Count;
 			GameObject go = activeBoxesList [0] as GameObject;
 			Destroy(go);
@@ -56,8 +56,8 @@ public class BoxSpawningController : MonoBehaviour {
 	}
 
 	//Coroutine ami vár random ideig aztán meghívja azt a függvényt ami elkészít egy dobozt
-	IEnumerator WaitForSpawn(){
-		spwTime = Random.Range (3, 5);
+	IEnumerator WaitForSpawn(int minTime, int maxTime){
+		spwTime = Random.Range (minTime, maxTime);
 		yield return new WaitForSeconds (spwTime);
 		BoxSpawning ();
 	}

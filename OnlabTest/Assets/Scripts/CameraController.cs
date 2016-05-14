@@ -15,7 +15,8 @@ using System.Collections.Generic;
 public class CameraController : MonoBehaviour {
 
 	[HideInInspector]
-	public Transform[] targets;
+	//Lista ami tárolja a követendő GameObjecteket
+	//A Game Objectek saját magukat rakják bele a listába a játék elején
 	public ArrayList targets2 = new ArrayList();
 	public float boundingBoxPadding = 2f;
 	public float minimumOrthographicSize = 8f;
@@ -37,8 +38,6 @@ public class CameraController : MonoBehaviour {
 	{
 		camera = GetComponent<Camera>();
 		camera.orthographic = true;
-		targets [0] = GameObject.Find ("Player_b").GetComponent<Transform> ();
-		targets [1] = GameObject.Find ("Player_r").GetComponent<Transform> ();
 	}
 
 	void LateUpdate()
@@ -59,6 +58,11 @@ public class CameraController : MonoBehaviour {
 		float maxX = Mathf.NegativeInfinity;
 		float minY = Mathf.Infinity;
 		float maxY = Mathf.NegativeInfinity;
+
+		if (targets2.Count <= 0) {
+			Debug.Log ("Baj van");
+			return Rect.MinMaxRect (minX, minY, maxX, maxY);
+		}
 
 		foreach (Transform target in targets2) {
 			Vector3 position = target.position;

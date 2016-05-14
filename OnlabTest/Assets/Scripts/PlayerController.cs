@@ -237,10 +237,13 @@ public class PlayerController : MonoBehaviour {
 		if ((materialCheckBase.collider == null && materialCheckRight.collider != null)
 			|| (materialCheckBase.collider == null && materialCheckLeft.collider != null)) {
 			rb.AddForce (new Vector2 (MoveX * MaxSpeed, 0));
-		}else if ((materialCheckBase.collider != null) && (materialCheckBase.collider.tag == "NormalGround")) {
+		} else if ((materialCheckBase.collider != null) && (materialCheckBase.collider.tag == "NormalGround")) {
 			//Ha sima platformon állunk akkor nem kell erőbehatás
 			rb.velocity = new Vector2 (MoveX * MaxSpeed, rb.velocity.y);
 		} else if ((materialCheckBase.collider != null) && (materialCheckBase.collider.tag == "SlipperyGround")) {
+			//Viszont ha csúszós platformon állunk akkor kell erő hatás, mivel így érvényesül a Physics material
+			rb.AddForce (new Vector2 (MoveX * MaxSpeed, 0));
+		} else if ((materialCheckBase.collider != null) && (materialCheckBase.collider.tag == "StickyGround")) {
 			//Viszont ha csúszós platformon állunk akkor kell erő hatás, mivel így érvényesül a Physics material
 			rb.AddForce (new Vector2 (MoveX * MaxSpeed, 0));
 		} else {
@@ -269,7 +272,9 @@ public class PlayerController : MonoBehaviour {
 			Destroy (coll.gameObject);
 			powerUp = GenerateRandomPower ();
 		}
+	}
 
+	void OnTriggerEnter2D(Collider2D coll){
 		//Ha leesünk a lyukba
 		if (coll.gameObject.tag == "Hole") {
 			//Ha van nálunk labda akkor elejtjük
@@ -302,19 +307,6 @@ public class PlayerController : MonoBehaviour {
 	/// <returns>Random Power Up</returns>
 	public string GenerateRandomPower(){
 		string power = powerUps [Random.Range (0, powerUps.Length)];
-		/*switch (power) {
-		case "Speed":
-			powerUpImage.sprite = powerUpSprt_speed;
-			break;
-		case "FreezeTime":
-			powerUpImage.sprite = powerUpSprt_freezetime;
-			break;
-		case "HighJump":
-			powerUpImage.sprite = powerUpSprt_highjump;
-			break;
-		default:
-			powerUpImage.enabled = false;
-		}*/
 		powerUpImage.enabled = true;
 		if (power == "Speed") {
 			powerUpImage.sprite = powerUpSprt_speed;
@@ -444,7 +436,7 @@ public class PlayerController : MonoBehaviour {
 			//Az előzőleg kitalált erővel elütjük
 			go.GetComponent<Rigidbody2D> ().AddForce (randomForce);
 			//Meg is kell semmisíteni a jelző particle-t
-			Destroy (GameObject.FindGameObjectWithTag ("BallParticle"));
+			Destroy (transform.Find ("BallParticle(Clone)").gameObject);
 		}
 	}
 
