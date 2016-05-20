@@ -24,7 +24,7 @@ Két játékos van akiket irányíthatunk:
 
 ##Képek
 
-![gameplay gif](http://i.giphy.com/3o6EhHFVSTRRJU2ZqM.gif)
+![](http://i.giphy.com/3o6EhHFVSTRRJU2ZqM.gif)
 
 ##Kapcsolat
 
