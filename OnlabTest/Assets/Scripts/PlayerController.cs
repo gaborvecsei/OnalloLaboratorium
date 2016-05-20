@@ -306,16 +306,32 @@ public class PlayerController : MonoBehaviour {
 	/// </summary>
 	/// <returns>Random Power Up</returns>
 	public string GenerateRandomPower(){
-		string power = powerUps [Random.Range (0, powerUps.Length)];
+		//Meg kell jelenítseni a képet
 		powerUpImage.enabled = true;
-		if (power == "Speed") {
+		//Random szám 0 és 100 között
+		int rnd = Random.Range (0, 100);
+		//Külömböző véletlenszerűséggel adunk erőt
+		//Kissebb valószínűséggel adunk idő megállítást
+		if (rnd < 20) {
+			powerUpImage.sprite = powerUpSprt_freezetime;
+			return powerUps [1];
+		} else if (rnd < 60) {
+			powerUpImage.sprite = powerUpSprt_highjump;
+			return powerUps [2];
+		} else {
 			powerUpImage.sprite = powerUpSprt_speed;
+			return powerUps [0];
+		}
+
+		/*string power = powerUps [Random.Range (0, powerUps.Length)];
+		if (power == "Speed") {
+			
 		} else if (power == "HighJump") {
 			powerUpImage.sprite = powerUpSprt_highjump;
 		} else if (power == "FreezeTime") {
 			powerUpImage.sprite = powerUpSprt_freezetime;
 		}
-		return power;
+		return power;*/
 	}
 		
 	/// <summary>
