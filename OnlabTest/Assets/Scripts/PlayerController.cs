@@ -198,6 +198,11 @@ public class PlayerController : MonoBehaviour {
 				powerUpTime = 5;
 			}
 		}
+
+		//Ha leesne akkor inkább feltesszük a tetejére a kamerának
+		if (transform.position.y < -10) {
+			transform.position = new Vector2 (transform.position.x, 5.0f);
+		}
 	}
 
 	/// <summary>
