@@ -22,6 +22,10 @@ Két játékos van akiket irányíthatunk:
 | Blue Player | W,A,S,D |           E          |       Q      |
 | Red Player  | I,J,K,L |           U          |       O      |
 
+##Próbáld ki!
+[Ezen a linken éred el. ](https://gaborvecsei.itch.io/onlab)
+Ahhoz, hogy játszhass vele le kell tölteni és telepíteni kell egy Unity-s plugint ami csak Edge,Firefox és Opera böngészöből érhető el. Sajnos a Unity még nem támogatja a Chrome-ot.
+
 ##Képek
 #####Gameplay gif
 <img  height=300 src="https://github.com/gaborvecsei/OnalloLaboratorium/blob/master/GameplayImages/Gameplay1.gif" />
