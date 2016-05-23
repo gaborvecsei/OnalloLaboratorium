@@ -34,9 +34,6 @@ Vecsei Gábor
 
 [Personal Blog][1]
 
-[Repos][2]
-
 2016 február
 
 [1]: http://gaborvecsei.wordpress.com
-[2]: https://bitbucket.org/gaborvecsei
