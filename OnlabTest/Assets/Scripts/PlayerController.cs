@@ -81,8 +81,7 @@ public class PlayerController : MonoBehaviour {
 	protected GameObject player_b;
 	private GameObject otherPlayer;
 	//Power up-ok listája
-	//private string[] powerUps = { "Speed", "FreezeTime", "HighJump" };
-	private string[] powerUps = { "Speed", "Speed", "Speed" };
+	private string[] powerUps = { "Speed", "FreezeTime", "HighJump" };
 	//Aktuális power up amivel rendelkezik
 	private string powerUp = "None";
 	private bool gotPowerUp = false;
@@ -206,11 +205,6 @@ public class PlayerController : MonoBehaviour {
 				powerUpTime = 5;
 			}
 		}
-
-		//Ha leesne akkor inkább feltesszük a tetejére a kamerának
-		if (transform.position.y < -10) {
-			transform.position = new Vector2 (transform.position.x, 5.0f);
-		}
 	}
 
 	/// <summary>
@@ -303,15 +297,28 @@ public class PlayerController : MonoBehaviour {
 	/// Újra hozzáadja megát a kamera listájához.
 	/// </summary>
 	IEnumerator WaitForRespawn(){
+		//Megálljon egyhelyben
+		GetComponent<Rigidbody2D> ().constraints = RigidbodyConstraints2D.FreezeAll;
+		//Ne lássuk a sprite-ot a játékban
 		gameObject.GetComponent<SpriteRenderer> ().enabled = false;
+		//Nem kell a kamerának követnie
 		mainCamera.GetComponent<CameraController> ().targets2.Remove (thisTransform);
+		//Ez a várakozási idő amíg nem kerül vissza a játékba
 		float waitTime = 3.0f;
+		//Randm X pozíció
 		float rndXPos = Random.Range (9.0f, -9.0f);
+		//Állandó y pozíció, mivel egy magasságból akarjuk csak leejteni
 		float YPos = 5.0f;
+		//Várunk
 		yield return new WaitForSeconds (waitTime);
+		//Új pozíciót adunk neki (random)
 		transform.position = new Vector2 (rndXPos, YPos);
+		//Újra látható miután letelt az idő
 		gameObject.GetComponent<SpriteRenderer> ().enabled = true;
+		//Újra követheti a kamera
 		mainCamera.GetComponent<CameraController> ().targets2.Add (thisTransform);
+		//A rotationt mindig freezelni kell, nehogy eldőljön
+		GetComponent<Rigidbody2D> ().constraints = RigidbodyConstraints2D.FreezeRotation;
 	}
 
 	/// <summary>
@@ -335,16 +342,6 @@ public class PlayerController : MonoBehaviour {
 			powerUpImage.sprite = powerUpSprt_speed;
 			return powerUps [0];
 		}
-
-		/*string power = powerUps [Random.Range (0, powerUps.Length)];
-		if (power == "Speed") {
-			
-		} else if (power == "HighJump") {
-			powerUpImage.sprite = powerUpSprt_highjump;
-		} else if (power == "FreezeTime") {
-			powerUpImage.sprite = powerUpSprt_freezetime;
-		}
-		return power;*/
 	}
 		
 	/// <summary>
