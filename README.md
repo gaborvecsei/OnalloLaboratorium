@@ -42,6 +42,6 @@ Vecsei Gábor
 
 [Personal Blog][1]
 
-2016 február
+2016 tavasz
 
 [1]: http://gaborvecsei.wordpress.com
