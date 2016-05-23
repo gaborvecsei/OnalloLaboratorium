@@ -56,7 +56,7 @@ public class GameManager : MonoBehaviour {
 			CheckTheWinner ();
 		}
 
-		if (Input.GetKeyDown (KeyCode.KeypadEnter)) {
+		if (Input.GetKeyDown (KeyCode.Return)) {
 			Application.LoadLevel ("MainScene");
 		}
 	}

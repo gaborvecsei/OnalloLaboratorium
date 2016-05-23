@@ -98,6 +98,9 @@ public class PlayerController : MonoBehaviour {
 	public Sprite powerUpSprt_freezetime;
 	public Image powerUpImage;
 
+	public GameObject kickBallAnim;
+	private TrailRenderer trail;
+
 
 	/// <summary>
 	/// Start this instance.
@@ -120,6 +123,10 @@ public class PlayerController : MonoBehaviour {
 		mainCamera.GetComponent<CameraController> ().targets2.Add (thisTransform);
 		powerUpImage = powerUpImage.GetComponent<Image> ();
 		powerUpImage.enabled = false;
+
+		//Először nem kell, hogy csíkot húzzon maga után csak ha gyorsasága van
+		trail = GetComponent<TrailRenderer> ();
+		trail.enabled = false;
 
 	}
 
@@ -351,6 +358,8 @@ public class PlayerController : MonoBehaviour {
 		case "Speed":
 			MaxSpeed = 10f;
 			powerUpTime = 7;
+			//Be kell kapcsolni a csík húzását
+			trail.enabled = true;
 			break;
 		case "FreezeTime":
 			//A másik játékos számára megállítja az időt
@@ -380,6 +389,8 @@ public class PlayerController : MonoBehaviour {
 		powerUp = "None";
 		otherPlayer.GetComponent<Rigidbody2D> ().constraints = RigidbodyConstraints2D.FreezeRotation;
 		powerUpImage.enabled = false;
+		//Ki kell kapcsolni a csíkot
+		trail.enabled = false;
 	}
 
 	/// <summary>
@@ -413,6 +424,7 @@ public class PlayerController : MonoBehaviour {
 
 	void KickTheBall(){
 		GameObject go;
+		GameObject go_kickBallAnim;
 		kickTime = 0;
 		canKick = false;
 		//Ha kiütöttük akkor már nincs a másiknál a labda
@@ -424,6 +436,8 @@ public class PlayerController : MonoBehaviour {
 		go = Instantiate (ballGo, otherPlayerPos + new Vector3 (0, 1f, 0), Quaternion.identity) as GameObject;
 		//Az előzőleg kitalált erővel elütjük
 		go.GetComponent<Rigidbody2D> ().AddForce (randomForce);
+		//Lejátszuk az animációt ami a kiütést szemlélteti
+		go_kickBallAnim = Instantiate(kickBallAnim, transform.position, Quaternion.identity) as GameObject;
 		//Meg is kell semmisíteni a jelző particle-t
 		Destroy(otherPlayer.transform.Find("BallParticle(Clone)").gameObject);
 	}
