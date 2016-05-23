@@ -81,7 +81,8 @@ public class PlayerController : MonoBehaviour {
 	protected GameObject player_b;
 	private GameObject otherPlayer;
 	//Power up-ok listája
-	private string[] powerUps = { "Speed", "FreezeTime", "HighJump" };
+	//private string[] powerUps = { "Speed", "FreezeTime", "HighJump" };
+	private string[] powerUps = { "Speed", "Speed", "Speed" };
 	//Aktuális power up amivel rendelkezik
 	private string powerUp = "None";
 	private bool gotPowerUp = false;

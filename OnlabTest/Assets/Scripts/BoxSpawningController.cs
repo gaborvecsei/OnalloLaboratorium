@@ -22,7 +22,7 @@ public class BoxSpawningController : MonoBehaviour {
 
 
 	void Start () {
-		StartCoroutine (WaitForSpawn (25,30));
+		StartCoroutine (WaitForSpawn (1,2));
 	}
 
 	//Ezzel hozzuk létre az új dobozt amiben valamilyen erő van
