@@ -23,8 +23,12 @@ Két játékos van akiket irányíthatunk:
 | Red Player  | I,J,K,L |           U          |       O      |
 
 ##Képek
-
-[Gammeplay Gif](http://i.giphy.com/3o6EhHFVSTRRJU2ZqM.gif)
+#####Gameplay gif
+<img  height=300 src="https://github.com/gaborvecsei/OnalloLaboratorium/blob/master/GameplayImages/Gameplay1.gif" />
+#####Kick the ball from the other
+<img  height=300 src="https://github.com/gaborvecsei/OnalloLaboratorium/blob/master/GameplayImages/BallKick.gif" />
+#####Get Speed power up
+<img  height=300 src="https://github.com/gaborvecsei/OnalloLaboratorium/blob/master/GameplayImages/GetSpeedPowerUp.gif" />
 
 ##Kapcsolat
 
