@@ -22,6 +22,10 @@ Két játékos van akiket irányíthatunk:
 | Blue Player | W,A,S,D |           E          |       Q      |
 | Red Player  | I,J,K,L |           U          |       O      |
 
+##Képek
+
+[Gammeplay Gif](http://i.giphy.com/3o6EhHFVSTRRJU2ZqM.gif)
+
 ##Kapcsolat
 
 Vecsei Gábor
