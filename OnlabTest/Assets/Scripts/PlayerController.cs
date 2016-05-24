@@ -7,6 +7,7 @@ using UnityEngine.UI;
 //Kell ahhoz, hogy a platformon maradjon
 [RequireComponent (typeof (BoxCollider2D))]
 //Kell ahhoz, hogy a másik játékostól ki tudja ütnia  labdát
+//Trigger típusúnak kell lennie
 [RequireComponent (typeof (CircleCollider2D))]
 
 /// <summary>
@@ -251,7 +252,7 @@ public class PlayerController : MonoBehaviour {
 			//Viszont ha csúszós platformon állunk akkor kell erő hatás, mivel így érvényesül a Physics material
 			rb.AddForce (new Vector2 (MoveX * MaxSpeed, 0));
 		} else if ((materialCheckBase.collider != null) && (materialCheckBase.collider.tag == "StickyGround")) {
-			//Viszont ha csúszós platformon állunk akkor kell erő hatás, mivel így érvényesül a Physics material
+			//Viszont ha ragadós platformon állunk akkor kell erő hatás, mivel így érvényesül a Physics material
 			rb.AddForce (new Vector2 (MoveX * MaxSpeed, 0));
 		} else {
 			rb.velocity = new Vector2 (MoveX * MaxSpeed, rb.velocity.y);
