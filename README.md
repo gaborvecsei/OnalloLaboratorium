@@ -27,7 +27,7 @@ Két játékos van akiket irányíthatunk:
 Ahhoz, hogy játszhass vele le kell tölteni és telepíteni kell egy Unity-s plugint ami csak Edge,Firefox és Opera böngészöből érhető el. Sajnos a Unity még nem támogatja a Chrome-ot.
 
 ##Dokumentáció + Prezentáció
-Az Önálló Laboratóriumi projectem deokumentációját megtalálod [ITT](https://github.com/gaborvecsei/OnalloLaboratorium/blob/master/Documentation/OnLab_dokumentacio.pdf) és a prezentációt pedig [ITT](https://github.com/gaborvecsei/OnalloLaboratorium/blob/master/Presentation/Onlab_Presentation.pdf)
+Az Önálló Laboratóriumi projectem **dokumentációját** megtalálod **[ITT](https://github.com/gaborvecsei/OnalloLaboratorium/blob/master/Documentation/OnLab_dokumentacio.pdf)** és a **prezentációt** pedig **[ITT](https://github.com/gaborvecsei/OnalloLaboratorium/blob/master/Presentation/Onlab_Presentation.pdf)**
 
 ##Képek
 #####Gameplay gif
