@@ -421,6 +421,9 @@ public class PlayerController : MonoBehaviour {
 		}
 	}
 
+	/// <summary>
+	/// Kicks the ball from the other player
+	/// </summary>
 	void KickTheBall(){
 		GameObject go;
 		GameObject go_kickBallAnim;
@@ -441,6 +444,9 @@ public class PlayerController : MonoBehaviour {
 		Destroy(otherPlayer.transform.Find("BallParticle(Clone)").gameObject);
 	}
 
+	/// <summary>
+	/// Throws the ball.
+	/// </summary>
 	void ThrowTheBall(){
 			GameObject go;
 			if (faceingLeft) {
